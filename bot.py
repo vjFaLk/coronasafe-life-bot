@@ -1,27 +1,13 @@
 #!/usr/bin/env python
 # pylint: disable=C0116
-# This program is dedicated to the public domain under the CC0 license.
-
-"""
-Simple Bot to reply to Telegram messages.
-
-First, a few handler functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
-Then, the bot is started and runs until we press Ctrl-C on the command line.
-
-Usage:
-Basic Echobot example, repeats messages.
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
-"""
 
 import logging
 import os
 
 import requests
-from telegram import Update, ForceReply
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-from telegram.utils.helpers import escape_markdown
+from telegram import ForceReply, Update
+from telegram.ext import (CallbackContext, CommandHandler, Filters,
+                          MessageHandler, Updater)
 
 from constants import *
 
@@ -70,8 +56,6 @@ def get_formatted_message(data):
 
     return message
 
-# Define a few command handlers. These usually take the two arguments update and
-# context.
 def start(update: Update, _: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
