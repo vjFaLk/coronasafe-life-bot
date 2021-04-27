@@ -35,17 +35,18 @@ def get_district_data(message, service_data):
                 service_district = district
                 break
     return [x for x in service_data 
-            if (x.get("district").lower() == service_district 
-            and (x.get("verificationStatus") == "Verified"))]
+            if (x.get("district").lower() == service_district)][:10]
 
 def get_formatted_message(data):
-    message = "<b>Here's what I've found</b> - \n\n"
+    if len(data) >= 10:
+        message = "<b>Here are the top 10 results I've found. Use link below to find all results</b> - \n\n"
+    else:
+        message = "<b>Here are the results I've found - \n\n"
 
     for entry in data:
         message += "<b><i>{}</i></b>\n".format(entry.get("name").rstrip("\n"))
         for key, value in entry.items():
-            if not key in ["id", "lastVerifiedOn", 
-            "verificationStatus","createdTime", "verifiedBy", "name", "type"] and value:
+            if not key in ["id", "lastVerifiedOn","createdTime", "verifiedBy", "name", "type"] and value:
                 if isinstance(value, str):
                     value = value.rstrip("\n")
 
