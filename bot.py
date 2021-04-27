@@ -56,24 +56,22 @@ def get_formatted_message(data):
 
     return message
 
-def start(update: Update, _: CallbackContext) -> None:
-    """Send a message when the command /start is issued."""
-    user = update.effective_user
-    update.message.reply_markdown_v2(
-        fr'Hi {user.mention_markdown_v2()}\!',
-        reply_markup=ForceReply(selective=True),
-    )
-
-
 def help_command(update: Update, _: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
     update.message.reply_text("""
+
+    <b>Resources available - ambulance, helpline, hospital, medicine, oxygen</b>
+
+    Enter the resource you're looking for along with the city / district - 
+
+    [resource] in [city / district]
+
     Examples - 
 
     oxygen in Mumbai
     hospitals in Bangalore
     
-    """)
+    """, parse_mode="HTML")
 
 
 def handle_response(update: Update, _: CallbackContext) -> None:
@@ -101,7 +99,7 @@ def main() -> None:
     dispatcher = updater.dispatcher
 
     # on different commands - answer in Telegram
-    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("start", help_command))
     dispatcher.add_handler(CommandHandler("help", help_command))
 
     # on non command i.e message - echo the message on Telegram
