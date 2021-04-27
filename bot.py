@@ -41,7 +41,7 @@ def get_formatted_message(data):
     if len(data) >= 10:
         message = "<b>Here are the top 10 results I've found. Use link below to find all results</b> - \n\n"
     else:
-        message = "<b>Here are the results I've found - \n\n"
+        message = "<b>Here are the results I've found</b> - \n\n"
 
     for entry in data:
         message += "<b><i>{}</i></b>\n".format(entry.get("name").rstrip("\n"))
