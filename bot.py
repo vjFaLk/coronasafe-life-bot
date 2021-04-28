@@ -3,6 +3,8 @@
 
 import logging
 import os
+import functools
+import sentry_sdk
 
 import requests
 from telegram import ForceReply, Update
@@ -17,6 +19,22 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+def catch_error(f):
+    @functools.wraps(f)
+    def wrap(update, callback):
+        logger.info("User {user} sent {message}".format(user=update.message.from_user.username, message=update.message.text))
+        try:
+            return f(update, callback)
+        except Exception as e:
+            sentry_sdk.init(os.getenv("SENTRY_DSN"), traces_sample_rate=1.0)
+            sentry_sdk.set_user({"username": update.message.from_user.username})
+            sentry_sdk.set_context("user_message", {"text" : update.message.text})
+            sentry_sdk.capture_exception()
+            logger.error(str(e))
+            update.message.reply_text(text="An error has occurred")
+
+    return wrap
 
 def get_service_type(message):
     for word in message.split(' '):
@@ -44,9 +62,14 @@ def get_formatted_message(data):
         message = "<b>Here are the results I've found</b> - \n\n"
 
     for entry in data:
-        message += "<b><i>{}</i></b>\n".format(entry.get("name").rstrip("\n"))
+        if entry.get("name"):
+            message += "<b><i>{}</i></b>\n".format(entry.get("name").rstrip("\n"))
+        else:
+            continue
+        
         for key, value in entry.items():
-            if not key in ["id", "lastVerifiedOn","createdTime", "verifiedBy", "name", "type"] and value:
+            if not key in ["id", "lastVerifiedOn",
+                "createdTime", "verifiedBy", "name", "type"] and value:
                 if isinstance(value, str):
                     value = value.rstrip("\n")
 
@@ -74,7 +97,7 @@ def help_command(update: Update, _: CallbackContext) -> None:
     
     """, parse_mode="HTML")
 
-
+@catch_error
 def handle_response(update: Update, _: CallbackContext) -> None:
     message = update.message.text.lower().replace("?", "")
     service_type = get_service_type(message)
