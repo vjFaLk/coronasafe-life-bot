@@ -83,7 +83,7 @@ def get_formatted_message(data):
     if not data:
         return "That's all the information we have as of now"
 
-    message = "<b>Here are some options</b> Send `/more` to get more results - \n\n"
+    message = "<b>Here are some options -</b>\n\n"
 
     for entry in data:
         if entry.get("name"):
@@ -107,7 +107,7 @@ def get_formatted_message(data):
                 message += "<b>{}</b> - {}\n".format(key.title(), value)
         message += "\n"
 
-    message += "Data fetched from - https://life.coronasafe.network/"
+    message += "<b>Reply with /more to get more results</b>\nData fetched from - https://life.coronasafe.network/"
 
     return message
 
@@ -177,6 +177,7 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("hospital", handle_response))
     dispatcher.add_handler(CommandHandler("medicine", handle_response))
     dispatcher.add_handler(CommandHandler("oxygen", handle_response))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, help_command))
 
     # Start the Bot
     updater.start_polling()
